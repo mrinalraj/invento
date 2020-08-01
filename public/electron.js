@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow } = require('electron')
 const db = require('../db')
 const path = require('path')
 const url = require('url')
@@ -11,7 +11,7 @@ global.db = db
 
 function createWindow() {
 	// Create the browser window.
-	mainWindow = new BrowserWindow({ width: 800, height: 600, webPreferences: { nodeIntegration: true } })
+	mainWindow = new BrowserWindow({ width: 1920, height: 1080, webPreferences: { nodeIntegration: true } })
 
 	// and load the index.html of the app.
 	const startUrl =
