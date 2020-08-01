@@ -1,15 +1,13 @@
-const electron = require('electron')
-// Module to control application life.
-const app = electron.app
-// Module to create native browser window.
-const BrowserWindow = electron.BrowserWindow
-
+const { app, BrowserWindow, ipcMain } = require('electron')
+const db = require('../db')
 const path = require('path')
 const url = require('url')
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
+
+global.db = db
 
 function createWindow() {
 	// Create the browser window.
@@ -25,9 +23,9 @@ function createWindow() {
 		})
 	mainWindow.loadURL(startUrl)
 	// Open the DevTools.
-	if (process.env.NODE_ENV === 'development') {
-		mainWindow.webContents.openDevTools()
-	}
+	// if (process.env.NODE_ENV === 'development') {
+	mainWindow.webContents.openDevTools()
+	// }
 
 	// remove menubar
 	mainWindow.setMenuBarVisibility(false)
