@@ -2,24 +2,34 @@
 	"name": "invento",
 	"version": "0.1.0",
 	"private": true,
-	"devDependencies": {
-		"electron": "^9.1.2"
+	"build": {
+		"appId": "com.invento",
+		"files": [
+			"build/**/*",
+			"node_modules/**/*"
+		]
 	},
-	"dependencies": {
-		"@testing-library/jest-dom": "^4.2.4",
-		"@testing-library/react": "^9.3.2",
-		"@testing-library/user-event": "^7.1.2",
-		"react": "^16.13.1",
-		"react-dom": "^16.13.1",
+	"devDependencies": {
+		"electron": "^9.1.2",
+		"electron-builder": "^22.8.0",
+		"foreman": "^3.0.1",
 		"react-scripts": "3.4.1"
 	},
-	"main": "src/electron-start.js",
+	"dependencies": {
+		"nedb-promises": "^4.0.4",
+		"react": "^16.13.1",
+		"react-dom": "^16.13.1"
+	},
+	"homepage": "./",
+	"main": "public/electron.js",
 	"scripts": {
 		"start": "react-scripts start",
 		"build": "react-scripts build",
 		"test": "react-scripts test",
 		"eject": "react-scripts eject",
-		"electron": "electron ."
+		"dev": "nf start -p 3000",
+		"electron": "electron .",
+		"test-build": "electron-builder"
 	},
 	"eslintConfig": {
 		"extends": "react-app"
