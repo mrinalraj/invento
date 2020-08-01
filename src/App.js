@@ -1,14 +1,16 @@
 import React from 'react'
-
-import { Layout, Menu, Breadcrumb } from 'antd'
+import { Layout, Menu } from 'antd'
+import { Link } from 'react-router-dom'
 import styled from 'styled-components'
+import { BrowserRouter } from 'react-router-dom'
+import Routes from './Routes'
 
 const { Header, Content, Footer } = Layout
 const SiteLayoutContent = styled.div`
 	background: #fff;
 	padding: 24px;
 	min-height: 80vh;
-	margin-top: 2rem;
+	margin-top: 4rem;
 `
 const Logo = styled.div`
 	width: 120px;
@@ -18,25 +20,40 @@ const Logo = styled.div`
 	float: left;
 `
 
-function App() {
+function App(props) {
 	return (
-		<div className='App'>
+		<BrowserRouter>
 			<Layout className='layout'>
 				<Header>
 					<Logo />
-					<Menu theme='dark' mode='horizontal' defaultSelectedKeys={['2']}>
-						<Menu.Item key='1'>Inventory</Menu.Item>
-						<Menu.Item key='2'>Invoices</Menu.Item>
-						<Menu.Item key='3'>Retails</Menu.Item>
-						<Menu.Item key='3'>Products</Menu.Item>
+					<Menu theme='dark' mode='horizontal' defaultSelectedKeys={['0']}>
+						<Menu.Item key='0'>
+							<Link to='/'>Home</Link>
+						</Menu.Item>
+						<Menu.Item key='1'>
+							<Link to='/inventory'>Inventory</Link>
+						</Menu.Item>
+
+						<Menu.Item key='2'>
+							<Link to='/invoice'>Invoices</Link>
+						</Menu.Item>
+
+						<Menu.Item key='3'>
+							<Link to='/retailers'>Retailers</Link>
+						</Menu.Item>
+						<Menu.Item key='4'>
+							<Link to='/products'>Products</Link>
+						</Menu.Item>
 					</Menu>
 				</Header>
 				<Content style={{ padding: '0 50px' }}>
-					<SiteLayoutContent>Content</SiteLayoutContent>
+					<SiteLayoutContent>
+						<Routes />
+					</SiteLayoutContent>
 				</Content>
-				<Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
+				<Footer style={{ textAlign: 'center' }}>Invento ©2018 Created by Ant UED</Footer>
 			</Layout>
-		</div>
+		</BrowserRouter>
 	)
 }
 
