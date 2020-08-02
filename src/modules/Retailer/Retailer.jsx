@@ -1,9 +1,12 @@
 import React from 'react'
-import { PageHeader, Button, Table } from 'antd'
+import { PageHeader, Button, Table, Input, Modal, Form } from 'antd'
 import { UserAddOutlined } from '@ant-design/icons'
 import { retailerColumns } from './tableColumns'
 
+const { Search } = Input
+
 const Retailer = () => {
+	const [form] = Form.useForm()
 	const data = [
 		{
 			key: '1',
@@ -28,6 +31,18 @@ const Retailer = () => {
 		},
 	]
 
+	// const showRetailerModal = () => {
+	// setState({
+	// 		visible: true,
+	// 	})
+	// }
+
+	// const hideRetailerModal = () => {
+	// setState({
+	// 		visible: false,
+	// 	})
+	// }
+
 	return (
 		<>
 			<PageHeader
@@ -35,12 +50,45 @@ const Retailer = () => {
 				title='View Retailers'
 				subTitle='Add or Edit a retailer here'
 				extra={[
-					<Button type='primary' shape='round' icon={<UserAddOutlined />}>
-						Add Retailer
-					</Button>,
+					<>
+						<Search placeholder='Search by Retailer' onSearch={value => console.log(value)} style={{ width: 300, marginRight: '2rem' }} />
+						<Button type='primary' shape='round' icon={<UserAddOutlined />} onClick={showRetailerModal}>
+							Add Retailer
+						</Button>
+					</>,
 				]}
 			/>
-			<Table columns={retailerColumns} dataSource={data} />
+
+			<Table rowKey='key' columns={retailerColumns} dataSource={data} />
+			<Modal title='Basic Modal' visible={true} onCancel={hideRetailerModal}>
+				<Form
+					form={form}
+					name='register'
+					// onFinish={onFinish}
+					initialValues={{
+						residence: ['zhejiang', 'hangzhou', 'xihu'],
+						prefix: '86',
+					}}
+					scrollToFirstError
+				>
+					<Form.Item
+						name='email'
+						label='E-mail'
+						rules={[
+							{
+								type: 'email',
+								message: 'The input is not valid E-mail!',
+							},
+							{
+								required: true,
+								message: 'Please input your E-mail!',
+							},
+						]}
+					>
+						<Input />
+					</Form.Item>
+				</Form>
+			</Modal>
 		</>
 	)
 }

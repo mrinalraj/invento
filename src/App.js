@@ -23,7 +23,7 @@ const Logo = styled.div`
 function App(props) {
 	return (
 		<BrowserRouter>
-			<Layout className='layout'>
+			<Layout className='layout' style={{ height: '100vh', width: '100vw', overflow: 'hidden', position: 'relative' }}>
 				<Header>
 					<Logo />
 					<Menu theme='dark' mode='horizontal' defaultSelectedKeys={['0']}>
