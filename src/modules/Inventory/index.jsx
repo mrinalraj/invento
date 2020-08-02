@@ -5,7 +5,10 @@ import { inventoryColumns } from './inventoryColumns'
 import { getInventoryList, deleteInventoryRecord, getTotal, searchInventory, deleteInventoryRecordList } from '@requests/inventory'
 import CreateInventoryItem from './CreateInventoryItem'
 import { useCustomState } from '@components/useCustomState'
-const DEFAULT_PAGE_SIZE = 50
+import CreateSKU from './CreateSKU'
+import { markSKUDelink } from '@requests/skuMaster'
+import EditInventoryItems from './EditInventoryItems'
+const DEFAULT_PAGE_SIZE = 500
 
 const initialState = {
 	inventoryList: [],
@@ -13,6 +16,9 @@ const initialState = {
 	loading: false,
 	selectedRows: [],
 	addItemVisible: false,
+	multiEditOpen: false,
+	addSKUVisible: false,
+	editingRow: false,
 }
 
 const Inventory = () => {
@@ -44,19 +50,22 @@ const Inventory = () => {
 		}
 	}
 
-	const onDelete = async id => {
+	const onDelete = async (id, sku) => {
 		try {
 			const rows = await deleteInventoryRecord(id)
 			if (rows && rows < 2) {
 				message.success('Deleted Row')
-			} else {
-				message.warn(rows + ' deleted.')
+				await markSKUDelink(sku)
 			}
 		} catch (e) {
 			message.error(e)
 		} finally {
 			fetchList()
 		}
+	}
+
+	const onEditClicked = record => {
+		setState({ editingRow: record, addItemVisible: true })
 	}
 
 	const onSearch = async term => {
@@ -89,9 +98,6 @@ const Inventory = () => {
 		}
 	}
 
-	// Add Item modal functions
-	const setModalVisibility = value => setState({ addItemVisible: value })
-
 	return (
 		<>
 			<PageHeader
@@ -99,6 +105,16 @@ const Inventory = () => {
 				title='Inventory'
 				subTitle='View the full details fo your inventory.'
 				extra={[
+					<Button
+						type='primary'
+						shape='round'
+						icon={<PlusOutlined />}
+						onClick={() => {
+							setState({ addSKUVisible: true })
+						}}
+					>
+						Add New SKU
+					</Button>,
 					<Button
 						type='primary'
 						shape='round'
@@ -113,7 +129,7 @@ const Inventory = () => {
 						shape='round'
 						icon={<EditFilled />}
 						onClick={() => {
-							setState({ addItemVisible: true })
+							setState({ multiEditOpen: true })
 						}}
 					>
 						Edit Items
@@ -143,7 +159,7 @@ const Inventory = () => {
 			<Table
 				rowKey='_id'
 				loading={state.loading}
-				columns={inventoryColumns({ onDelete })}
+				columns={inventoryColumns({ onDelete, onEditClicked })}
 				dataSource={state.inventoryList}
 				rowSelection={{
 					type: 'checkbox',
@@ -155,7 +171,32 @@ const Inventory = () => {
 				}}
 				scroll={{ y: '60vh' }}
 			/>
-			<CreateInventoryItem visible={state.addItemVisible} closeModal={() => setModalVisibility(false)} />
+			{state.addItemVisible && (
+				<CreateInventoryItem
+					visible={state.addItemVisible}
+					closeModal={() => {
+						setState({ addItemVisible: false, editingRow: false })
+						setPage({ pageNumber: 1, ...page })
+					}}
+					destroyOnClose={true}
+					editing={state.editingRow}
+				/>
+			)}
+			{state.multiEditOpen && (
+				<EditInventoryItems
+					visible={state.multiEditOpen}
+					closeModal={() => {
+						setState({ multiEditOpen: false })
+						setPage({ pageNumber: 1, ...page })
+					}}
+				/>
+			)}
+			<CreateSKU
+				visible={state.addSKUVisible}
+				closeModal={() => {
+					setState({ addSKUVisible: false })
+				}}
+			/>
 		</>
 	)
 }

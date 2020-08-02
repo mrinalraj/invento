@@ -1,7 +1,8 @@
 import React from 'react'
 import DeleteConfirmation from '@components/DeleteConfirmation'
+import { EditFilled } from '@ant-design/icons'
 
-export const inventoryColumns = ({ onDelete }) => [
+export const inventoryColumns = ({ onDelete, onEditClicked }) => [
 	{
 		title: 'SKU',
 		dataIndex: 'SKU',
@@ -23,14 +24,17 @@ export const inventoryColumns = ({ onDelete }) => [
 		key: 'pricePerUnit',
 	},
 	{
-		title: 'Margin',
-		dataIndex: 'margin',
-		key: 'margin',
+		title: '',
+		dataIndex: 'edit',
+		key: 'edit',
+		width: 50,
+		render: (view, record) => <EditFilled type='primary' style={{ cursor: 'pointer' }} onClick={() => onEditClicked(record)} />,
 	},
 	{
 		title: '',
 		dataIndex: '_id',
 		key: '_id',
-		render: id => <DeleteConfirmation action={() => onDelete(id)} />,
+		width: 50,
+		render: (id, { SKU }) => <DeleteConfirmation action={() => onDelete(id, SKU)} />,
 	},
 ]

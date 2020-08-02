@@ -22,6 +22,11 @@ export const createInventoryRecord = async record => {
 	return await db.insert(record)
 }
 
+export const updateInventoryItem = async record => {
+	const query = { SKU: record.SKU }
+	return await db.update(query, record, { upsert: true })
+}
+
 export const deleteInventoryRecord = async _id => {
 	return await db.remove({ _id }, {})
 }
