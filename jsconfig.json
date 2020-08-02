@@ -1,0 +1,14 @@
+{
+	"compilerOptions": {
+		"target": "es2017",
+		"baseUrl": "./",
+		"paths": {
+			"@modules/*": ["src/modules/*"],
+			"@requests/*": ["src/requests/*"],
+			"@components/*": ["src/sharedComponents/*"],
+			"@utils/*": ["src/utils/*"],
+			"antd": ["node_modules/antd/lib/index"]
+		}
+	},
+	"exclude": ["node_modules", "build"]
+}

@@ -12,5 +12,5 @@ const dbFactory = fileName =>
 module.exports = {
 	inventory: dbFactory('inventory.db'),
 	skuMaster: dbFactory('skuMaster.db'),
-	retailers: dbFactory('retailers'),
+	retailers: dbFactory('retailers.db'),
 }

@@ -9,7 +9,13 @@ module.exports = {
 			plugin: CracoAlias,
 			options: {
 				source: 'options',
-				aliases: {},
+				baseUrl: './src',
+				aliases: {
+					'@modules': 'modules',
+					'@requests': 'requests',
+					'@components': 'sharedComponents',
+					'@utils': 'utils',
+				},
 			},
 		},
 	],

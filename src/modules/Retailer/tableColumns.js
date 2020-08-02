@@ -1,5 +1,6 @@
 import React from 'react'
-import { EyeOutlined } from '@ant-design/icons'
+import { EditOutlined, UserDeleteOutlined } from '@ant-design/icons'
+import { deleteRetailerRecord } from '@requests/retailer'
 
 export const retailerColumns = [
 	{
@@ -23,9 +24,15 @@ export const retailerColumns = [
 		key: 'email',
 	},
 	{
-		title: 'View',
+		title: '',
+		dataIndex: 'edit',
+		key: 'edit',
+		render: view => <EditOutlined />,
+	},
+	{
+		title: '',
 		dataIndex: 'view',
 		key: 'view',
-		render: view => <EyeOutlined />,
+		render: (_, record) => <UserDeleteOutlined onClick={async () => await deleteRetailerRecord(record._id)} />,
 	},
 ]

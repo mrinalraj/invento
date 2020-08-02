@@ -1,47 +1,62 @@
-import React from 'react'
-import { PageHeader, Button, Table, Input, Modal, Form } from 'antd'
-import { UserAddOutlined } from '@ant-design/icons'
+import React, { useState, useEffect } from 'react'
+import { PageHeader, Button, Table, Input, message } from 'antd'
+import { UserAddOutlined, FileSyncOutlined } from '@ant-design/icons'
 import { retailerColumns } from './tableColumns'
+import { useCustomState } from '@components/useCustomState'
+import AddRetailer from './AddRetailer'
+import { getRetailerList, getTotalRetailers } from '@requests/retailer'
 
 const { Search } = Input
+const DEFAULT_PAGE_SIZE = 50
+
+const initialState = {
+	addRetailerModalVisible: 0,
+	selectedRows: [],
+	loading: false,
+	retailerList: [],
+}
 
 const Retailer = () => {
-	const [form] = Form.useForm()
-	const data = [
-		{
-			key: '1',
-			name: 'John Brown',
-			age: 32,
-			address: 'New York No. 1 Lake Park',
-			tags: ['nice', 'developer'],
-		},
-		{
-			key: '2',
-			name: 'Jim Green',
-			age: 42,
-			address: 'London No. 1 Lake Park',
-			tags: ['loser'],
-		},
-		{
-			key: '3',
-			name: 'Joe Black',
-			age: 32,
-			address: 'Sidney No. 1 Lake Park',
-			tags: ['cool', 'teacher'],
-		},
-	]
+	const [state, setState] = useCustomState(initialState)
+	const [page, setPage] = useState({
+		pageSize: DEFAULT_PAGE_SIZE,
+		pageNumber: 1,
+	})
 
-	// const showRetailerModal = () => {
-	// setState({
-	// 		visible: true,
-	// 	})
-	// }
+	useEffect(() => {
+		fetchRetailerList(page)
+	}, [page])
 
-	// const hideRetailerModal = () => {
-	// setState({
-	// 		visible: false,
-	// 	})
-	// }
+	const fetchRetailerList = async (currentPage = page) => {
+		setState({ loading: true })
+		const { pageNumber, pageSize } = page
+		console.log(currentPage)
+		try {
+			const list = await getRetailerList({ pageNumber, pageSize })
+			const total = await getTotalRetailers()
+			console.log(list, total)
+			setState({
+				retailerList: list,
+				total,
+			})
+		} catch (e) {
+			message.error(e)
+		} finally {
+			setState({ loading: false })
+		}
+	}
+
+	const showRetailerModal = () => {
+		setState({
+			addRetailerModalVisible: true,
+		})
+	}
+
+	const hideRetailerModal = () => {
+		setState({
+			addRetailerModalVisible: false,
+		})
+	}
 
 	return (
 		<>
@@ -51,44 +66,47 @@ const Retailer = () => {
 				subTitle='Add or Edit a retailer here'
 				extra={[
 					<>
-						<Search placeholder='Search by Retailer' onSearch={value => console.log(value)} style={{ width: 300, marginRight: '2rem' }} />
 						<Button type='primary' shape='round' icon={<UserAddOutlined />} onClick={showRetailerModal}>
 							Add Retailer
 						</Button>
 					</>,
 				]}
 			/>
-
-			<Table rowKey='key' columns={retailerColumns} dataSource={data} />
-			<Modal title='Basic Modal' visible={true} onCancel={hideRetailerModal}>
-				<Form
-					form={form}
-					name='register'
-					// onFinish={onFinish}
-					initialValues={{
-						residence: ['zhejiang', 'hangzhou', 'xihu'],
-						prefix: '86',
+			<div style={{ marginLeft: '1rem', paddingBottom: '2rem' }}>
+				<Search placeholder='Search by Retailer' onSearch={value => console.log(value)} style={{ width: '20vw', marginRight: '2rem' }} />
+				<Button
+					type='primary'
+					shape='round'
+					style={{ marginRight: '2rem' }}
+					onClick={() => {
+						setPage({ pageNumber: 1, ...page })
 					}}
-					scrollToFirstError
 				>
-					<Form.Item
-						name='email'
-						label='E-mail'
-						rules={[
-							{
-								type: 'email',
-								message: 'The input is not valid E-mail!',
-							},
-							{
-								required: true,
-								message: 'Please input your E-mail!',
-							},
-						]}
-					>
-						<Input />
-					</Form.Item>
-				</Form>
-			</Modal>
+					<FileSyncOutlined /> Refresh Records
+				</Button>
+			</div>
+			<Table
+				rowKey='key'
+				columns={retailerColumns}
+				dataSource={state.retailerList}
+				rowSelection={{
+					type: 'checkbox',
+					onChange: selectedRows => setState({ selectedRows }),
+				}}
+				pagination={{
+					defaultPageSize: DEFAULT_PAGE_SIZE,
+					pageSizeOptions: [20, 50, 100, 150, 200],
+					showSizeChanger: true,
+					total: state.total,
+					onChange: pageNumber => setPage({ pageNumber, ...page }),
+					onShowSizeChange: (_, pageSize) => {
+						console.log(_, pageSize)
+						setPage({ pageNumber: 1, pageSize })
+						console.log(page)
+					},
+				}}
+			/>
+			<AddRetailer addRetailerModalVisible={state.addRetailerModalVisible} hideRetailerModal={hideRetailerModal} />
 		</>
 	)
 }
