@@ -1,6 +1,7 @@
 import React from 'react'
 
 import { Route, Switch } from 'react-router-dom'
+import Inventory from './modules/Inventory'
 
 const Routes = () => {
 	return (
@@ -9,7 +10,7 @@ const Routes = () => {
 				<div>home</div>
 			</Route>
 			<Route path='/inventory' exact>
-				<div>inventory</div>
+				<Inventory />
 			</Route>
 			<Route path='/invoice' exact>
 				<div>invoice</div>
