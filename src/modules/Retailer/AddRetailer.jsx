@@ -1,23 +1,66 @@
-import React from 'react'
-import { Input, Modal, Form } from 'antd'
-import { createRetailerRecord } from '@requests/retailer'
+import React, { useEffect } from 'react'
+import { Input, Modal, Form, message } from 'antd'
+import { createRetailerRecord, updateRetailerRecord } from '@requests/retailer'
 
-const AddRetailer = ({ addRetailerModalVisible, hideRetailerModal }) => {
+const AddRetailer = ({ addRetailerModalVisible, hideRetailerModal, editRetailerData, fetchRetailerList }) => {
 	const [form] = Form.useForm()
+
+	useEffect(() => {
+		!!editRetailerData &&
+			form.setFieldsValue({
+				name: editRetailerData.name,
+				address: editRetailerData.address,
+				phone: editRetailerData.phone,
+				email: editRetailerData.email,
+			})
+	})
+	const editMode = !!editRetailerData ? true : false
 	const addRetailer = () => {
 		form.validateFields()
 			.then(async values => {
 				form.resetFields()
 				console.log(values)
-				await createRetailerRecord(values).then(console.log)
+				if (!editMode) {
+					createRetailerRecord(values)
+						.then(() => {
+							message.success('Retailer Added Successfully')
+							fetchRetailerList()
+						})
+						.catch(e => {
+							message.error('Unable to add retailer')
+						})
+				} else {
+					const data = {
+						...editRetailerData,
+						...values,
+					}
+					console.log(data)
+					updateRetailerRecord(data)
+						.then(() => {
+							message.success('Retailer Updated Successfully')
+							fetchRetailerList()
+						})
+						.catch(e => {
+							message.error('Unable to edit retailer')
+						})
+				}
 			})
 			.catch(info => {
 				console.log('Validate Failed:', info)
 			})
 	}
+
+	console.log(editRetailerData)
 	return (
-		<Modal title='Add Retailer' visible={addRetailerModalVisible} onCancel={hideRetailerModal} okText='Add' okButtonProps={{ type: 'submit' }} onOk={addRetailer}>
-			<Form layout='vertical' form={form} name='register' scrollToFirstError>
+		<Modal
+			title={editMode ? 'Edit Retailer' : 'Add Retailer'}
+			visible={addRetailerModalVisible}
+			onCancel={hideRetailerModal}
+			okText={editMode ? 'Update' : 'Add'}
+			onOk={addRetailer}
+			destroyOnClose={editMode ? true : false}
+		>
+			<Form layout='vertical' form={form} name='register' scrollToFirstError preserve={false}>
 				<Form.Item
 					name='name'
 					label='Name'
@@ -66,10 +109,6 @@ const AddRetailer = ({ addRetailerModalVisible, hideRetailerModal }) => {
 						{
 							type: 'email',
 							message: 'The input is not valid E-mail!',
-						},
-						{
-							required: true,
-							message: 'Please input your E-mail!',
 						},
 					]}
 				>
