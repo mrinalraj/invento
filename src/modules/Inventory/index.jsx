@@ -6,7 +6,7 @@ import { getInventoryList, deleteInventoryRecord, getTotal, searchInventory, del
 import CreateInventoryItem from './CreateInventoryItem'
 import { useCustomState } from '@components/useCustomState'
 import CreateSKU from './CreateSKU'
-import { markSKUDelink } from '@requests/skuMaster'
+import { markSKUDelink, delinkSKUList } from '@requests/skuMaster'
 import EditInventoryItems from './EditInventoryItems'
 const DEFAULT_PAGE_SIZE = 500
 
@@ -85,10 +85,15 @@ const Inventory = () => {
 
 	const deleteSelectedRows = async () => {
 		const { selectedRows } = state
+		const rows = selectedRows.map(row => row._id)
+		const skuList = selectedRows.map(row => row.SKU)
 		try {
-			const record = await deleteInventoryRecordList(selectedRows)
+			const record = await deleteInventoryRecordList(rows)
 			if (record) {
 				message.success(record + ' rows deleted.')
+				await delinkSKUList(skuList)
+					.then(records => console.log('delinnked ids', records))
+					.catch(console.error)
 			} else {
 				message.warn('Nothing deleted')
 			}
@@ -163,7 +168,7 @@ const Inventory = () => {
 				dataSource={state.inventoryList}
 				rowSelection={{
 					type: 'checkbox',
-					onChange: selectedRows => setState({ selectedRows }),
+					onChange: (_, selectedRows) => setState({ selectedRows }),
 				}}
 				pagination={{
 					defaultPageSize: DEFAULT_PAGE_SIZE,

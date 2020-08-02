@@ -19,3 +19,13 @@ export const markSKUDelink = async key => {
 	const query = { key }
 	return await db.update(query, { $set: { used: 0 } }, {})
 }
+
+export const delinkSKUList = async sukList => {
+	const query = { key: { $in: sukList } }
+	return await db.update(query, { $set: { used: 0 } }, { multi: true })
+}
+
+export const deleteAllSKU = async () => {
+	const query = {}
+	return db.remove(query, { multi: true })
+}
