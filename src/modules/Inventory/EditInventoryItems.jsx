@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Modal, Button, Form, Input, message, Select, Spin } from 'antd'
 import styled from 'styled-components'
-import { getSKUMasterList, markSKUEntry } from '@requests/skuMaster'
-import { createInventoryRecord, updateInventoryItem } from '@requests/inventory'
+import { updateInventoryItem, getInventoryList } from '@requests/inventory'
 
 const FormGrid = styled.div`
 	display: flex;
@@ -13,28 +12,24 @@ const FormGrid = styled.div`
 	}
 `
 
-const CreateInventoryItem = ({ visible, closeModal, editing }) => {
+const EditInventoryItems = ({ visible, closeModal }) => {
 	const [form] = Form.useForm()
-	const [skuList, setSkuList] = useState([])
+	const [ineventoryList, setInventoryList] = useState([])
 	const [loading, setLoading] = useState(false)
 
-	const addInventoryItem = () => {
-		form.validateFields().then(async values => {
-			try {
-				setLoading(true)
-				const record = await createInventoryRecord(values)
-				if (record) {
-					await markSKUEntry(record.SKU)
-					getSkuList()
-					message.success('Item Added')
-					form.resetFields()
-				}
-			} catch (e) {
-				message.error('Could not add item.')
-			} finally {
+	const fetchInventoryList = () => {
+		setLoading(true)
+		getInventoryList()
+			.then(docs => {
+				setInventoryList(docs)
+			})
+			.catch(error => {
+				console.log('error', error)
+				message.error('Error getting List')
+			})
+			.finally(() => {
 				setLoading(false)
-			}
-		})
+			})
 	}
 
 	const editInventoryItem = () => {
@@ -43,39 +38,24 @@ const CreateInventoryItem = ({ visible, closeModal, editing }) => {
 				setLoading(true)
 				const record = await updateInventoryItem(values)
 				if (record) {
-					message.success('Item Updated')
-					closeModal()
+					message.success('Document updated')
+					form.resetFields()
 				}
 			} catch (e) {
-				message.error('Could not add item.')
+				message.error('Could not update.')
 			} finally {
 				setLoading(false)
 			}
 		})
 	}
 
-	const onClickSave = () => {
-		if (editing) {
-			editInventoryItem()
-		} else {
-			addInventoryItem()
-		}
-	}
-
-	const getSkuList = () => {
-		getSKUMasterList()
-			.then(docs => {
-				setSkuList(docs)
-			})
-			.catch(error => {
-				console.log('error', error)
-				message.error('Error getting SKU List')
-			})
+	const onSelect = value => {
+		const record = ineventoryList.find(item => item.SKU === value)
+		form.setFieldsValue(record)
 	}
 
 	useEffect(() => {
-		if (!editing) getSkuList()
-		else form.setFieldsValue(editing)
+		fetchInventoryList()
 	}, [])
 
 	return (
@@ -87,8 +67,8 @@ const CreateInventoryItem = ({ visible, closeModal, editing }) => {
 			width={900}
 			destroyOnClose={true}
 			footer={[
-				<Button type='primary' shape='round' key='save' onClick={onClickSave}>
-					{(!!editing && 'Update') || 'Save'}
+				<Button type='primary' shape='round' key='save' onClick={editInventoryItem}>
+					Save
 				</Button>,
 				<Button key='close' shape='round' onClick={closeModal}>
 					Close
@@ -108,24 +88,19 @@ const CreateInventoryItem = ({ visible, closeModal, editing }) => {
 								},
 							]}
 						>
-							{(editing && <Input value={editing.SKU} disabled={true} />) || (
-								<Select
-									onSelect={value => {
-										const name = skuList.find(sku => sku.key === value).name
-										form.setFieldsValue({ name })
-									}}
-									showSearch
-									placeholder='Search for SKU'
-									optionFilterProp='children'
-									filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-								>
-									{skuList.map(sku => (
-										<Select.Option key={sku.key} value={sku.key} disabled={sku.used}>
-											{sku.key}
-										</Select.Option>
-									))}
-								</Select>
-							)}
+							<Select
+								onSelect={onSelect}
+								showSearch
+								placeholder='Search for SKU'
+								optionFilterProp='children'
+								filterOption={(input, option) => option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
+							>
+								{ineventoryList.map(record => (
+									<Select.Option key={record.SKU} value={record.SKU}>
+										{record.SKU}
+									</Select.Option>
+								))}
+							</Select>
 						</Form.Item>
 						<Form.Item
 							name='name'
@@ -173,4 +148,4 @@ const CreateInventoryItem = ({ visible, closeModal, editing }) => {
 	)
 }
 
-export default CreateInventoryItem
+export default EditInventoryItems

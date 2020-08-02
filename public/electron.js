@@ -1,5 +1,5 @@
 const { app, BrowserWindow } = require('electron')
-const db = require('../db')
+const db = require('./db')
 const path = require('path')
 const url = require('url')
 
@@ -11,7 +11,9 @@ global.db = db
 
 function createWindow() {
 	// Create the browser window.
-	mainWindow = new BrowserWindow({ width: 1920, height: 1080, webPreferences: { nodeIntegration: true } })
+	mainWindow = new BrowserWindow({
+		webPreferences: { nodeIntegration: true },
+	})
 
 	// and load the index.html of the app.
 	const startUrl =
@@ -29,6 +31,7 @@ function createWindow() {
 
 	// remove menubar
 	mainWindow.setMenuBarVisibility(false)
+	mainWindow.maximize()
 
 	// Emitted when the window is closed.
 	mainWindow.on('closed', function () {
@@ -48,9 +51,7 @@ app.on('ready', createWindow)
 app.on('window-all-closed', function () {
 	// On OS X it is common for applications and their menu bar
 	// to stay active until the user quits explicitly with Cmd + Q
-	if (process.platform !== 'darwin') {
-		app.quit()
-	}
+	app.quit()
 })
 
 app.on('activate', function () {

@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { PageHeader, Button, Table, message, Input } from 'antd'
-import { PlusOutlined, EditFilled, LockFilled, DeleteFilled, FileSyncOutlined } from '@ant-design/icons'
+import { PlusOutlined, EditFilled, DeleteFilled, FileSyncOutlined } from '@ant-design/icons'
 import { inventoryColumns } from './inventoryColumns'
-import { getInventoryList, deleteInventoryRecord, getTotal, searchInventory, fillRandomData, deleteAllInventoryRecord } from '@requests/inventory'
+import { getInventoryList, deleteInventoryRecord, getTotal, searchInventory, deleteInventoryRecordList } from '@requests/inventory'
 import CreateInventoryItem from './CreateInventoryItem'
 import { useCustomState } from '@components/useCustomState'
-const DEFAULT_PAGE_SIZE = 50
+import CreateSKU from './CreateSKU'
+import { markSKUDelink, delinkSKUList } from '@requests/skuMaster'
+import EditInventoryItems from './EditInventoryItems'
+const DEFAULT_PAGE_SIZE = 500
 
 const initialState = {
 	inventoryList: [],
@@ -13,6 +16,9 @@ const initialState = {
 	loading: false,
 	selectedRows: [],
 	addItemVisible: false,
+	multiEditOpen: false,
+	addSKUVisible: false,
+	editingRow: false,
 }
 
 const Inventory = () => {
@@ -44,19 +50,22 @@ const Inventory = () => {
 		}
 	}
 
-	const onDelete = async id => {
+	const onDelete = async (id, sku) => {
 		try {
 			const rows = await deleteInventoryRecord(id)
 			if (rows && rows < 2) {
 				message.success('Deleted Row')
-			} else {
-				message.warn(rows + ' deleted.')
+				await markSKUDelink(sku)
 			}
 		} catch (e) {
 			message.error(e)
 		} finally {
 			fetchList()
 		}
+	}
+
+	const onEditClicked = record => {
+		setState({ editingRow: record, addItemVisible: true })
 	}
 
 	const onSearch = async term => {
@@ -74,8 +83,25 @@ const Inventory = () => {
 		}
 	}
 
-	// Add Item modal functions
-	const setModalVisibility = value => setState({ addItemVisible: value })
+	const deleteSelectedRows = async () => {
+		const { selectedRows } = state
+		const rows = selectedRows.map(row => row._id)
+		const skuList = selectedRows.map(row => row.SKU)
+		try {
+			const record = await deleteInventoryRecordList(rows)
+			if (record) {
+				message.success(record + ' rows deleted.')
+				await delinkSKUList(skuList)
+					.then(records => console.log('delinnked ids', records))
+					.catch(console.error)
+			} else {
+				message.warn('Nothing deleted')
+			}
+			fetchList()
+		} catch (e) {
+			message.erorr('Something went wrong')
+		}
+	}
 
 	return (
 		<>
@@ -89,8 +115,17 @@ const Inventory = () => {
 						shape='round'
 						icon={<PlusOutlined />}
 						onClick={() => {
+							setState({ addSKUVisible: true })
+						}}
+					>
+						Add New SKU
+					</Button>,
+					<Button
+						type='primary'
+						shape='round'
+						icon={<PlusOutlined />}
+						onClick={() => {
 							setState({ addItemVisible: true })
-							fillRandomData(10)
 						}}
 					>
 						Add Items
@@ -99,8 +134,7 @@ const Inventory = () => {
 						shape='round'
 						icon={<EditFilled />}
 						onClick={() => {
-							deleteAllInventoryRecord()
-							setState({ addItemVisible: true })
+							setState({ multiEditOpen: true })
 						}}
 					>
 						Edit Items
@@ -111,7 +145,6 @@ const Inventory = () => {
 			<div style={{ marginLeft: '1rem', paddingBottom: '2rem' }}>
 				<Input.Search placeholder='Input search text' style={{ width: '20vw', marginRight: '2rem' }} onSearch={onSearch} />
 				<Button
-					type='primary'
 					shape='round'
 					style={{ marginRight: '2rem' }}
 					onClick={() => {
@@ -122,14 +155,8 @@ const Inventory = () => {
 				</Button>
 				{!!state.selectedRows?.length && (
 					<>
-						<Button type='primary' shape='round' style={{ marginRight: '2rem' }}>
+						<Button type='primary' shape='round' style={{ marginRight: '2rem' }} onClick={deleteSelectedRows}>
 							<DeleteFilled /> Delete Rows
-						</Button>
-						<Button type='secondary' shape='round' style={{ marginRight: '2rem' }}>
-							<EditFilled /> Edit Rows
-						</Button>
-						<Button type='secondary' shape='round'>
-							<LockFilled /> Make Protected
 						</Button>
 					</>
 				)}
@@ -137,27 +164,44 @@ const Inventory = () => {
 			<Table
 				rowKey='_id'
 				loading={state.loading}
-				columns={inventoryColumns({ onDelete })}
+				columns={inventoryColumns({ onDelete, onEditClicked })}
 				dataSource={state.inventoryList}
 				rowSelection={{
 					type: 'checkbox',
-					onChange: selectedRows => setState({ selectedRows }),
+					onChange: (_, selectedRows) => setState({ selectedRows }),
 				}}
 				pagination={{
 					defaultPageSize: DEFAULT_PAGE_SIZE,
-					pageSizeOptions: [20, 50, 100, 150, 200],
-					showSizeChanger: true,
 					total: state.total,
-					onChange: pageNumber => setPage({ pageNumber, ...page }),
-					onShowSizeChange: (_, pageSize) => {
-						console.log(_, pageSize)
-						setPage({ pageNumber: 1, pageSize })
-						console.log(page)
-					},
 				}}
 				scroll={{ y: '60vh' }}
 			/>
-			<CreateInventoryItem visible={state.addItemVisible} closeModal={() => setModalVisibility(false)} />
+			{state.addItemVisible && (
+				<CreateInventoryItem
+					visible={state.addItemVisible}
+					closeModal={() => {
+						setState({ addItemVisible: false, editingRow: false })
+						setPage({ pageNumber: 1, ...page })
+					}}
+					destroyOnClose={true}
+					editing={state.editingRow}
+				/>
+			)}
+			{state.multiEditOpen && (
+				<EditInventoryItems
+					visible={state.multiEditOpen}
+					closeModal={() => {
+						setState({ multiEditOpen: false })
+						setPage({ pageNumber: 1, ...page })
+					}}
+				/>
+			)}
+			<CreateSKU
+				visible={state.addSKUVisible}
+				closeModal={() => {
+					setState({ addSKUVisible: false })
+				}}
+			/>
 		</>
 	)
 }

@@ -7,8 +7,7 @@ export const getInventoryList = async params => {
 	const pageNumber = params?.pageNumber || 0,
 		pageSize = params?.pageSize || 0
 
-	console.log(pageSize, pageNumber)
-
+	console.log(pageNumber, pageSize)
 	return await db
 		.find({})
 		.skip(pageSize * (pageNumber - 1))
@@ -23,8 +22,18 @@ export const createInventoryRecord = async record => {
 	return await db.insert(record)
 }
 
+export const updateInventoryItem = async record => {
+	const query = { SKU: record.SKU }
+	return await db.update(query, record, { upsert: true })
+}
+
 export const deleteInventoryRecord = async _id => {
 	return await db.remove({ _id }, {})
+}
+
+export const deleteInventoryRecordList = async list => {
+	const query = { _id: { $in: list } }
+	return await db.remove(query, { multi: true })
 }
 
 export const deleteAllInventoryRecord = async () => {
@@ -33,9 +42,10 @@ export const deleteAllInventoryRecord = async () => {
 
 export const searchInventory = async term => {
 	const exp = new RegExp(term)
-	return await db.find({
+	const query = {
 		$or: [{ SKU: { $regex: exp } }, { name: { $regex: exp } }],
-	})
+	}
+	return await db.find(query)
 }
 
 export const fillRandomData = async number => {

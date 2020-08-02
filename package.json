@@ -39,7 +39,7 @@
 		"eject": "craco eject",
 		"dev": "nf start -p 3000",
 		"electron": "electron .",
-		"test-build": "electron-builder"
+		"test-build": "electron-builder --ia32"
 	},
 	"eslintConfig": {
 		"extends": "react-app"
