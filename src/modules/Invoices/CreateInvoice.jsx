@@ -185,9 +185,9 @@ const CreateInvoice = ({ history }) => {
 		form.validateFields()
 			.then(async values => {
 				const { items } = values
-				if (!items) return message.error('atleast one item should be entered.')
+				if (!items || !items.length) return message.error('atleast one item should be entered.')
 				values.retailer = retailers.find(retailer => retailer.name === values.retailer)._id
-				values.invoiceNo = invoiceNumber + 1
+				values.invoiceNo = (invoiceNumber + 1).toString()
 				values.totalAmount = total
 
 				try {

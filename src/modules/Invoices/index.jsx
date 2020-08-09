@@ -56,9 +56,13 @@ const Invoices = ({ history }) => {
 		setState({ loading: true })
 		try {
 			const list = await searchInvoice(value)
+			const retailerList = await getRetailerList()
+
+			const invoiceList = list.map(invoice => ({ ...invoice, retailerDetails: retailerList.find(r => r._id === invoice.retailer) }))
+
 			console.log(list)
 			setState({
-				invoiceList: list,
+				invoiceList,
 				total: list.length,
 			})
 		} catch (e) {
