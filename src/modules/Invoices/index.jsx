@@ -5,6 +5,7 @@ import { useCustomState } from '@components/useCustomState'
 import { invoiceColumns } from './invoiceColumns'
 import { getInvoiceList, getTotalInvoices, fillRandomData, searchInvoice } from '@requests/invoice'
 import { getRetailerList } from '@requests/retailer'
+import { openPreview, onPrint } from './invoiceFileFunctions'
 
 const { Search } = Input
 
@@ -72,10 +73,6 @@ const Invoices = ({ history }) => {
 		}
 	}
 
-	const openModal = data => {
-		console.log(data)
-		setState({ openViewModal: true })
-	}
 	return (
 		<>
 			<PageHeader
@@ -111,7 +108,7 @@ const Invoices = ({ history }) => {
 			</div>
 			<Table
 				rowKey='_id'
-				columns={invoiceColumns({ openModal })}
+				columns={invoiceColumns({ openPreview, onPrint })}
 				dataSource={state.invoiceList}
 				pagination={{
 					defaultPageSize: DEFAULT_PAGE_SIZE,

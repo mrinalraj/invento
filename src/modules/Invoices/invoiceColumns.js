@@ -1,14 +1,16 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { CurrencyList } from '@utils/CurrencyList'
+import { PrinterFilled } from '@ant-design/icons'
+import { Button } from 'antd'
 
-export const invoiceColumns = ({ openModal }) => [
+export const invoiceColumns = ({ openPreview, onPrint }) => [
 	{
 		title: 'Invoice No.',
 		dataIndex: 'invoiceNo',
 		key: 'invoiceNo',
 		render: (invoiceno, record) => (
-			<Link to={{}} onClick={() => openModal(record)}>
+			<Link to={{}} onClick={() => openPreview(record)}>
 				{invoiceno}
 			</Link>
 		),
@@ -39,5 +41,15 @@ export const invoiceColumns = ({ openModal }) => [
 		dataIndex: 'totalAmount',
 		key: 'totalAmount',
 		render: totalAmount => `${CurrencyList[window.currency].symbol_native} ${totalAmount}`,
+	},
+	{
+		title: '',
+		dataIndex: '_id',
+		key: '_id',
+		render: (id, record) => (
+			<Button type='link' onClick={() => onPrint(record)}>
+				<PrinterFilled />
+			</Button>
+		),
 	},
 ]

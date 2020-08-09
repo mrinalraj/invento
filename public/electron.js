@@ -7,6 +7,7 @@ const url = require('url')
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow
 
+global.userDataPath = app.getPath('userData')
 global.db = db
 
 function createWindow() {

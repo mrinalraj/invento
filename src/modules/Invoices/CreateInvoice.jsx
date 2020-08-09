@@ -22,6 +22,7 @@ const ItemRow = ({ form, field, sku, remove, calculateTotal, onSelectRemoveProdu
 			// onSelectRemoveProduct(sku)
 			let values = form.getFieldValue()
 			values.items[field.fieldKey].pricePerUnit = +prod.pricePerUnit
+			values.items[field.fieldKey].name = prod.name
 		} catch (e) {}
 	}
 
