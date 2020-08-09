@@ -4,7 +4,7 @@ import { UserAddOutlined, FileSyncOutlined } from '@ant-design/icons'
 import { retailerColumns } from './tableColumns'
 import { useCustomState } from '@components/useCustomState'
 import AddRetailer from './AddRetailer'
-import { getRetailerList, getTotalRetailers } from '@requests/retailer'
+import { getRetailerList, getTotalRetailers, searchRetailer } from '@requests/retailer'
 
 const { Search } = Input
 const DEFAULT_PAGE_SIZE = 50
@@ -39,7 +39,6 @@ const Retailer = () => {
 		try {
 			const list = await getRetailerList({ pageNumber, pageSize })
 			const total = await getTotalRetailers()
-			console.log(list, total)
 			setState({
 				retailerList: list,
 				total,
@@ -71,6 +70,21 @@ const Retailer = () => {
 		})
 	}
 
+	const onSearch = async value => {
+		setState({ loading: true })
+		try {
+			const list = await searchRetailer(value)
+			setState({
+				retailerList: list,
+				total: list.length,
+			})
+		} catch (e) {
+			message.error(e)
+		} finally {
+			setState({ loading: false })
+		}
+	}
+
 	return (
 		<>
 			<PageHeader
@@ -87,7 +101,7 @@ const Retailer = () => {
 				]}
 			/>
 			<div style={{ marginLeft: '1rem', paddingBottom: '2rem' }}>
-				<Search placeholder='Search by Retailer' onSearch={value => console.log(value)} style={{ width: '20vw', marginRight: '2rem' }} />
+				<Search placeholder='Search by Retailer' onSearch={onSearch} style={{ width: '20vw', marginRight: '2rem' }} />
 				<Button
 					type='primary'
 					shape='round'

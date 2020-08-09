@@ -58,6 +58,8 @@ const AddRetailer = ({ addRetailerModalVisible, hideRetailerModal, editRetailerD
 			okText={editMode ? 'Update' : 'Add'}
 			onOk={addRetailer}
 			destroyOnClose={editMode ? true : false}
+			okButtonProps={{ shape: 'round' }}
+			cancelButtonProps={{ shape: 'round' }}
 		>
 			<Form layout='vertical' form={form} name='register' scrollToFirstError preserve={false}>
 				<Form.Item

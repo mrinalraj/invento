@@ -8,7 +8,7 @@ const { Header, Content, Footer } = Layout
 const SiteLayoutContent = styled.div`
 	background: #fff;
 	padding: 0 24px;
-	height: calc(100vh - 114px);
+	min-height: calc(100vh - 114px);
 	margin-top: 50px;
 `
 const Logo = styled.div`

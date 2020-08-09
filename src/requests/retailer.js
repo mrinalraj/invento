@@ -27,3 +27,11 @@ export const deleteRetailerRecord = async _id => {
 export const updateRetailerRecord = async record => {
 	return await db.update({ _id: record._id }, record, { upsert: true })
 }
+
+export const searchRetailer = async term => {
+	const exp = new RegExp(term, 'i')
+	const query = {
+		$or: [{ name: { $regex: exp } }],
+	}
+	return await db.find(query)
+}

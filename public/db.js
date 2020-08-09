@@ -13,4 +13,6 @@ module.exports = {
 	inventory: dbFactory('inventory.db'),
 	skuMaster: dbFactory('skuMaster.db'),
 	retailers: dbFactory('retailers.db'),
+	invoice: dbFactory('invoice.db'),
+	meta: dbFactory('meta.db'),
 }
