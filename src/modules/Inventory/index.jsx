@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { PageHeader, Button, Table, message, Input } from 'antd'
-import { PlusOutlined, EditFilled, DeleteFilled, FileSyncOutlined } from '@ant-design/icons'
+import { PlusOutlined, EditFilled, DeleteOutlined, FileSyncOutlined, FolderAddFilled, IdcardOutlined } from '@ant-design/icons'
 import { inventoryColumns } from './inventoryColumns'
 import { getInventoryList, deleteInventoryRecord, getTotal, searchInventory, deleteInventoryRecordList } from '@requests/inventory'
 import CreateInventoryItem from './CreateInventoryItem'
@@ -21,7 +21,7 @@ const initialState = {
 	editingRow: false,
 }
 
-const Inventory = () => {
+const Inventory = props => {
 	const [state, setState] = useCustomState(initialState)
 	const [page, setPage] = useState({
 		pageSize: DEFAULT_PAGE_SIZE,
@@ -31,6 +31,8 @@ const Inventory = () => {
 	useEffect(() => {
 		fetchList(page)
 	}, [page])
+
+	console.log(props)
 
 	const fetchList = async (currentPage = page) => {
 		setState({ loading: true })
@@ -113,7 +115,7 @@ const Inventory = () => {
 					<Button
 						type='primary'
 						shape='round'
-						icon={<PlusOutlined />}
+						icon={<IdcardOutlined />}
 						onClick={() => {
 							setState({ addSKUVisible: true })
 						}}
@@ -144,9 +146,12 @@ const Inventory = () => {
 
 			<div style={{ marginLeft: '1rem', paddingBottom: '2rem' }}>
 				<Input.Search placeholder='Input search text' style={{ width: '20vw', marginRight: '2rem' }} onSearch={onSearch} />
+				<Button type='primary' shape='round' style={{ marginRight: '1rem' }} onClick={() => props.history.push('/incoming-trnasfer')}>
+					<FolderAddFilled /> Incoming Transfer
+				</Button>
 				<Button
 					shape='round'
-					style={{ marginRight: '2rem' }}
+					style={{ marginRight: '1rem' }}
 					onClick={() => {
 						setPage({ pageNumber: 1, ...page })
 					}}
@@ -155,8 +160,8 @@ const Inventory = () => {
 				</Button>
 				{!!state.selectedRows?.length && (
 					<>
-						<Button type='primary' shape='round' style={{ marginRight: '2rem' }} onClick={deleteSelectedRows}>
-							<DeleteFilled /> Delete Rows
+						<Button shape='round' style={{ marginRight: '1rem' }} onClick={deleteSelectedRows}>
+							<DeleteOutlined /> Delete Rows
 						</Button>
 					</>
 				)}

@@ -7,9 +7,9 @@ import Routes from './Routes'
 const { Header, Content, Footer } = Layout
 const SiteLayoutContent = styled.div`
 	background: #fff;
-	padding: 24px;
-	min-height: 80vh;
-	margin-top: 4rem;
+	padding: 0 24px;
+	height: calc(100vh - 114px);
+	margin-top: 50px;
 `
 const Logo = styled.div`
 	width: 120px;
@@ -31,11 +31,6 @@ const App = () => {
 			<Header>
 				<Logo />
 				<Menu theme='dark' mode='horizontal' selectedKeys={[route]}>
-					<Menu.Item key='home'>
-						<Link onClick={() => setRoute('home')} to='/'>
-							Home
-						</Link>
-					</Menu.Item>
 					<Menu.Item key='inventory'>
 						<Link onClick={() => setRoute('inventory')} to='/inventory'>
 							Inventory
@@ -65,7 +60,6 @@ const App = () => {
 					<Routes />
 				</SiteLayoutContent>
 			</Content>
-			<Footer style={{ textAlign: 'center' }}>Invento ©2018 Created by Ant UED</Footer>
 		</Layout>
 	)
 }
