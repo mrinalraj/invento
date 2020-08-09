@@ -74,6 +74,7 @@ const Retailer = () => {
 	return (
 		<>
 			<PageHeader
+				backIcon={false}
 				onBack={() => null}
 				title='View Retailers'
 				subTitle='Add or Edit a retailer here'

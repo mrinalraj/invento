@@ -50,7 +50,6 @@ const AddRetailer = ({ addRetailerModalVisible, hideRetailerModal, editRetailerD
 			})
 	}
 
-	console.log(editRetailerData)
 	return (
 		<Modal
 			title={editMode ? 'Edit Retailer' : 'Add Retailer'}
