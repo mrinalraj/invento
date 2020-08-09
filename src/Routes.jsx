@@ -6,6 +6,7 @@ import Inventory from '@modules/Inventory'
 import IncomingTransfer from '@modules/IncomingTransfer'
 import CreateTransfer from '@modules/IncomingTransfer/CreateTransfer'
 import Invoices from '@modules/Invoices'
+import CreateInvoice from '@modules/Invoices/CreateInvoice'
 
 const Routes = () => {
 	return (
@@ -16,8 +17,12 @@ const Routes = () => {
 			<Route path='/inventory' component={Inventory} exact />
 			<Route path='/incoming-trnasfer' component={IncomingTransfer} exact />
 			<Route path='/incoming-trnasfer/create' component={CreateTransfer} exact />
+
 			<Route path='/retailers' exact component={Retailer} />
+
 			<Route path='/invoice' exact component={Invoices} />
+			<Route path='/invoice/new' exact component={CreateInvoice} />
+
 			<Route path='/products' />
 		</Switch>
 	)
