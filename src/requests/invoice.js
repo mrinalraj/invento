@@ -21,7 +21,7 @@ export const createNewInvoice = async record => {
 export const searchInvoice = async term => {
 	const exp = new RegExp(term, 'i')
 	const query = {
-		$or: [{ retailer: { $regex: exp } }, { invoiceno: { $regex: exp } }],
+		$or: [{ invoiceNo: { $regex: exp } }],
 	}
 	return await db.find(query)
 }
