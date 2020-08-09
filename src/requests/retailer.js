@@ -23,3 +23,7 @@ export const getRetailerList = async params => {
 export const deleteRetailerRecord = async _id => {
 	return await db.remove({ _id }, {})
 }
+
+export const updateRetailerRecord = async record => {
+	return await db.update({ _id: record._id }, record, { upsert: true })
+}

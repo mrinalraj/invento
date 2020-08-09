@@ -14,6 +14,7 @@ const initialState = {
 	selectedRows: [],
 	loading: false,
 	retailerList: [],
+	retailerData: undefined,
 }
 
 const Retailer = () => {
@@ -23,9 +24,13 @@ const Retailer = () => {
 		pageNumber: 1,
 	})
 
-	useEffect(() => {
-		fetchRetailerList(page)
-	}, [page])
+	useEffect(
+		() => {
+			fetchRetailerList(page)
+		},
+		//eslint-disable-next-line react-hooks/exhaustive-deps
+		[page],
+	)
 
 	const fetchRetailerList = async (currentPage = page) => {
 		setState({ loading: true })
@@ -46,8 +51,9 @@ const Retailer = () => {
 		}
 	}
 
-	const showRetailerModal = () => {
+	const addRetailerModal = () => {
 		setState({
+			retailerData: undefined,
 			addRetailerModalVisible: true,
 		})
 	}
@@ -55,6 +61,13 @@ const Retailer = () => {
 	const hideRetailerModal = () => {
 		setState({
 			addRetailerModalVisible: false,
+		})
+	}
+
+	const editRetailerModal = retailerData => {
+		setState({
+			retailerData,
+			addRetailerModalVisible: true,
 		})
 	}
 
@@ -66,7 +79,7 @@ const Retailer = () => {
 				subTitle='Add or Edit a retailer here'
 				extra={[
 					<>
-						<Button type='primary' shape='round' icon={<UserAddOutlined />} onClick={showRetailerModal}>
+						<Button type='primary' shape='round' icon={<UserAddOutlined />} onClick={addRetailerModal}>
 							Add Retailer
 						</Button>
 					</>,
@@ -86,8 +99,8 @@ const Retailer = () => {
 				</Button>
 			</div>
 			<Table
-				rowKey='key'
-				columns={retailerColumns}
+				rowKey='_id'
+				columns={retailerColumns({ fetchRetailerList, editRetailerModal })}
 				dataSource={state.retailerList}
 				rowSelection={{
 					type: 'checkbox',
@@ -106,7 +119,12 @@ const Retailer = () => {
 					},
 				}}
 			/>
-			<AddRetailer addRetailerModalVisible={state.addRetailerModalVisible} hideRetailerModal={hideRetailerModal} />
+			<AddRetailer
+				addRetailerModalVisible={state.addRetailerModalVisible}
+				hideRetailerModal={hideRetailerModal}
+				editRetailerData={state.retailerData}
+				fetchRetailerList={fetchRetailerList}
+			/>
 		</>
 	)
 }
