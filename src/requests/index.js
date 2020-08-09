@@ -4,3 +4,4 @@ export const inventoryDB = database.inventory
 export const retailerDB = database.retailers
 export const skuMasterDB = database.skuMaster
 export const invoiceDB = database.invoice
+export const metaDB = database.meta

@@ -1,5 +1,4 @@
 import { invoiceDB as db } from './index'
-import { range } from '@utils/helpers'
 
 export const getInvoiceList = async params => {
 	const pageNumber = params?.pageNumber || 0,
@@ -15,16 +14,8 @@ export const getTotalInvoices = async () => {
 	return await db.count({})
 }
 
-export const fillRandomData = async () => {
-	const data = range(0, 2).map(number => {
-		const invoiceno = Math.floor(Math.random() * 100).toString(),
-			retailer = `Retailer name ${number}`,
-			phone = `99999999999`,
-			amount = Math.floor(Math.random() * 6) + 1
-
-		return { invoiceno, retailer, amount, phone }
-	})
-	return await db.insert(data)
+export const createNewInvoice = async record => {
+	return await db.insert(record)
 }
 
 export const searchInvoice = async term => {

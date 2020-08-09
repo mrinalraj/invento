@@ -14,6 +14,16 @@ export const getInventoryList = async params => {
 		.limit(pageSize)
 }
 
+export const findProductBySku = async sku => {
+	const query = { SKU: sku }
+	return await db.findOne(query)
+}
+
+export const findProductBySkuList = async skuList => {
+	const query = { SKU: { $in: skuList } }
+	return await db.find(query)
+}
+
 export const getTotal = async () => {
 	return await db.count({})
 }
@@ -41,7 +51,7 @@ export const deleteAllInventoryRecord = async () => {
 }
 
 export const searchInventory = async term => {
-	const exp = new RegExp(term)
+	const exp = new RegExp(term, 'i')
 	const query = {
 		$or: [{ SKU: { $regex: exp } }, { name: { $regex: exp } }],
 	}

@@ -1,11 +1,12 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+import { CurrencyList } from '@utils/CurrencyList'
 
 export const invoiceColumns = ({ openModal }) => [
 	{
 		title: 'Invoice No.',
-		dataIndex: 'invoiceno',
-		key: 'invoiceno',
+		dataIndex: 'invoiceNo',
+		key: 'invoiceNo',
 		render: (invoiceno, record) => (
 			<Link to={{}} onClick={() => openModal(record)}>
 				{invoiceno}
@@ -14,13 +15,15 @@ export const invoiceColumns = ({ openModal }) => [
 	},
 	{
 		title: 'Retailer Name',
-		dataIndex: 'retailer',
-		key: 'retailername',
+		dataIndex: 'retailerDetails',
+		key: 'retailerDetails',
+		render: retailerDetails => retailerDetails?.name,
 	},
 	{
 		title: `Retailer's Contact`,
-		dataIndex: 'phone',
-		key: 'retailercontact',
+		dataIndex: 'retailerDetails',
+		key: 'retailerDetails',
+		render: retailerDetails => retailerDetails?.phone,
 	},
 	{
 		title: 'Date',
@@ -33,7 +36,8 @@ export const invoiceColumns = ({ openModal }) => [
 	},
 	{
 		title: 'Amount',
-		dataIndex: 'amount',
-		key: 'amount',
+		dataIndex: 'totalAmount',
+		key: 'totalAmount',
+		render: totalAmount => `${CurrencyList[window.currency].symbol_native} ${totalAmount}`,
 	},
 ]

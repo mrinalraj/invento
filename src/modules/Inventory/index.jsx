@@ -37,7 +37,6 @@ const Inventory = props => {
 	const fetchList = async (currentPage = page) => {
 		setState({ loading: true })
 		const { pageNumber, pageSize } = page
-		console.log(currentPage)
 		try {
 			const list = await getInventoryList({ pageNumber, pageSize })
 			const total = await getTotal()
@@ -45,6 +44,7 @@ const Inventory = props => {
 				inventoryList: list,
 				total,
 			})
+			console.log(list)
 		} catch (e) {
 			message.error(e)
 		} finally {

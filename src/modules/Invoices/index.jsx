@@ -4,6 +4,7 @@ import { PlusOutlined, FileSyncOutlined } from '@ant-design/icons'
 import { useCustomState } from '@components/useCustomState'
 import { invoiceColumns } from './invoiceColumns'
 import { getInvoiceList, getTotalInvoices, fillRandomData, searchInvoice } from '@requests/invoice'
+import { getRetailerList } from '@requests/retailer'
 
 const { Search } = Input
 
@@ -37,12 +38,13 @@ const Invoices = ({ history }) => {
 		console.log(currentPage)
 		try {
 			const list = await getInvoiceList({ pageNumber, pageSize })
+			const retailerList = await getRetailerList()
+
+			const invoiceList = list.map(invoice => ({ ...invoice, retailerDetails: retailerList.find(r => r._id === invoice.retailer) }))
+
 			const total = await getTotalInvoices()
-			console.log(list, total)
-			setState({
-				invoiceList: list,
-				total,
-			})
+			console.log(invoiceList, total)
+			setState({ invoiceList, total })
 		} catch (e) {
 			message.error('Something went wrong')
 		} finally {
@@ -82,8 +84,8 @@ const Invoices = ({ history }) => {
 						shape='round'
 						icon={<PlusOutlined />}
 						onClick={() => {
-							// history.push('/invoice/new')
-							fillRandomData()
+							history.push('/invoice/new')
+							// fillRandomData()
 						}}
 					>
 						Create Invoice
