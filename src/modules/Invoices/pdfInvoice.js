@@ -23,8 +23,8 @@ export default `<html lang="en" style="border: 0; font: inherit; font-size: 100%
 				style="border: 0; font: inherit; font-size: 100%; height: 80px; margin: 0; padding: 0; vertical-align: baseline;">
 				<div
 					style="border: 0; float: left; font: inherit; font-size: 100%; margin: 0; padding: 0; vertical-align: baseline; width: 50%;">
-					<img src="http://placehold.it/230x70&text=logo" alt
-						style="border: 0; font: inherit; font-size: 100%; margin: 0; padding: 0; vertical-align: baseline;" />
+					<h2 style="vertical-align: baseline;">{{owner.name}}</h2>
+					<h4>{{owner.address}}</h4>
 				</div>
 				<div
 					style="border: 0; float: right; font: inherit; font-size: 100%; margin: 0; padding: 0; text-align: right; vertical-align: baseline;">
@@ -307,8 +307,7 @@ export default `<html lang="en" style="border: 0; font: inherit; font-size: 100%
 				">
 				<p
 					style="border: 0; font: inherit; font-size: 65%; line-height: 140%; margin: 0; margin-top: 1%; padding: 0; text-align: center; vertical-align: baseline;">
-					Lorem Ipsum <br />
-					Lorem Ipsum
+					For any querries contact : {{owner.phone}}
 				</p>
 			</div>
 		</div>

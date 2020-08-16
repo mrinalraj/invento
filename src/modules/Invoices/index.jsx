@@ -3,9 +3,12 @@ import { PageHeader, Button, Table, message, Input } from 'antd'
 import { PlusOutlined, FileSyncOutlined } from '@ant-design/icons'
 import { useCustomState } from '@components/useCustomState'
 import { invoiceColumns } from './invoiceColumns'
-import { getInvoiceList, getTotalInvoices, fillRandomData, searchInvoice } from '@requests/invoice'
+import { getInvoiceList, getTotalInvoices, searchInvoice } from '@requests/invoice'
 import { getRetailerList } from '@requests/retailer'
 import { openPreview, onPrint } from './invoiceFileFunctions'
+import { CurrencyList } from '@utils/CurrencyList'
+import moment from 'moment'
+import { ownerDetails } from '@requests/meta'
 
 const { Search } = Input
 
@@ -40,13 +43,21 @@ const Invoices = ({ history }) => {
 		try {
 			const list = await getInvoiceList({ pageNumber, pageSize })
 			const retailerList = await getRetailerList()
+			const owner = await ownerDetails()
 
-			const invoiceList = list.map(invoice => ({ ...invoice, retailerDetails: retailerList.find(r => r._id === invoice.retailer) }))
+			const invoiceList = list.map(invoice => ({
+				...invoice,
+				currency: CurrencyList[window.currency].symbol_native,
+				invoiceDate: moment(invoice.createdAt).format('DD/MM/YYYY'),
+				owner: owner.value,
+				retailerDetails: retailerList.find(r => r._id === invoice.retailer),
+			}))
 
 			const total = await getTotalInvoices()
 			console.log(invoiceList, total)
 			setState({ invoiceList, total })
 		} catch (e) {
+			console.log(e)
 			message.error('Something went wrong')
 		} finally {
 			setState({ loading: false })
@@ -58,8 +69,15 @@ const Invoices = ({ history }) => {
 		try {
 			const list = await searchInvoice(value)
 			const retailerList = await getRetailerList()
+			const owner = await ownerDetails()
 
-			const invoiceList = list.map(invoice => ({ ...invoice, retailerDetails: retailerList.find(r => r._id === invoice.retailer) }))
+			const invoiceList = list.map(invoice => ({
+				...invoice,
+				currency: CurrencyList[window.currency].symbol_native,
+				invoiceDate: moment(invoice.createdAt).format('DD/MM/YYYY'),
+				owner: owner.value,
+				retailerDetails: retailerList.find(r => r._id === invoice.retailer),
+			}))
 
 			console.log(list)
 			setState({
