@@ -45,13 +45,15 @@ const Invoices = ({ history }) => {
 			const retailerList = await getRetailerList()
 			const owner = await ownerDetails()
 
-			const invoiceList = list.map(invoice => ({
-				...invoice,
-				currency: CurrencyList[window.currency].symbol_native,
-				invoiceDate: moment(invoice.createdAt).format('DD/MM/YYYY'),
-				owner: owner.value,
-				retailerDetails: retailerList.find(r => r._id === invoice.retailer),
-			}))
+			const invoiceList = list
+				.map(invoice => ({
+					...invoice,
+					currency: CurrencyList[window.currency].symbol_native,
+					invoiceDate: moment(invoice.createdAt).format('DD/MM/YYYY'),
+					owner: owner.value,
+					retailerDetails: retailerList.find(r => r._id === invoice.retailer),
+				}))
+				.sort((a, b) => +b.invoiceNo - a.invoiceNo)
 
 			const total = await getTotalInvoices()
 			console.log(invoiceList, total)
@@ -104,7 +106,6 @@ const Invoices = ({ history }) => {
 						icon={<PlusOutlined />}
 						onClick={() => {
 							history.push('/invoice/new')
-							// fillRandomData()
 						}}
 					>
 						Create Invoice
@@ -128,6 +129,7 @@ const Invoices = ({ history }) => {
 				rowKey='_id'
 				columns={invoiceColumns({ openPreview, onPrint })}
 				dataSource={state.invoiceList}
+				loading={state?.loading}
 				pagination={{
 					defaultPageSize: DEFAULT_PAGE_SIZE,
 					pageSizeOptions: [20, 50, 100, 150, 200],

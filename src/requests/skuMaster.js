@@ -10,6 +10,19 @@ export const createNewSKU = async record => {
 	return await db.insert(record)
 }
 
+export const deleteSKU = async key => {
+	const query = { key }
+	return await db.remove(query, { multi: false })
+}
+
+export const searchSKU = async term => {
+	const exp = new RegExp(term, 'i')
+	const query = {
+		$or: [{ key: { $regex: exp } }, { name: { $regex: exp } }],
+	}
+	return await db.find(query)
+}
+
 export const markSKUEntry = async key => {
 	const query = { key }
 	return await db.update(query, { $set: { used: 1 } }, {})

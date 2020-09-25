@@ -5,7 +5,7 @@ import { getRetailerList } from '@requests/retailer'
 import moment from 'moment'
 import { getSKUMasterList } from '@requests/skuMaster'
 import { findProductBySku, findProductBySkuList, updateInventoryItem } from '@requests/inventory'
-import { getInvoiceNumber, increaseInvoiceNumber } from '@requests/meta'
+import { getInvoiceNumber, increaseInvoiceNumber, ownerDetails } from '@requests/meta'
 import { createNewInvoice } from '@requests/invoice'
 import { asyncForEach } from '@utils/helpers'
 import InvoiceSuccess from './InvoiceSuccess'
@@ -13,22 +13,26 @@ import { CurrencyList } from '@utils/CurrencyList'
 
 const ItemRow = ({ form, field, sku, remove, calculateTotal, onSelectRemoveProduct, setProductsList, productsList }) => {
 	const [product, setProduct] = React.useState({})
-	const [amount, setAmount] = React.useState()
+
 	const fetchProduct = async sku => {
 		try {
 			const prod = await findProductBySku(sku)
 			setProduct(prod)
 
-			// onSelectRemoveProduct(sku)
+			console.log('selecting product', prod)
 			let values = form.getFieldValue()
-			values.items[field.fieldKey].pricePerUnit = +prod.pricePerUnit
-			values.items[field.fieldKey].name = prod.name
-		} catch (e) {}
+			console.log(values, field)
+			values.items[field.name].pricePerUnit = +prod.pricePerUnit
+			values.items[field.name].name = prod.name
+		} catch (e) {
+			message.error('unable to find and select product')
+			console.info(e)
+		}
 	}
 
 	const calculateAmount = () => {
-		const discount = form.getFieldValue('items')[field.fieldKey].discount
-		const quantity = form.getFieldValue('items')[field.fieldKey].quantity
+		const discount = form.getFieldValue('items')[field.name]?.discount
+		const quantity = form.getFieldValue('items')[field.name]?.quantity
 		let values = form.getFieldValue()
 
 		if (discount === undefined || !quantity) {
@@ -39,20 +43,18 @@ const ItemRow = ({ form, field, sku, remove, calculateTotal, onSelectRemoveProdu
 		const rate = product?.pricePerUnit - discountAmount
 		const amount = rate * quantity
 
-		values.items[field.fieldKey].amount = amount
-		values.items[field.fieldKey].rate = rate
-		setAmount(amount)
+		values.items[field.name].amount = +amount.toFixed(2)
+		values.items[field.name].rate = +rate.toFixed(2)
 		calculateTotal()
 	}
 
 	return (
-		<div key={field.fieldKey} style={{ display: 'flex', border: '1px solid black', margin: '1rem 0' }}>
-			<div style={{ flex: '0 1 5%', borderRight: '1px solid black', margin: 0, paddingLeft: '8px' }}>{field.fieldKey + 1}</div>
+		<div key={field.name} style={{ display: 'flex', border: '1px solid black', margin: '1rem 0' }}>
+			<div style={{ flex: '0 1 5%', borderRight: '1px solid black', margin: 0, paddingLeft: '8px' }}>{field.name + 1}</div>
 			<Form.Item
 				{...field}
 				style={{ flex: '0 1 43%', borderRight: '1px solid black', margin: 0 }}
 				name={[field.name, 'sku']}
-				fieldKey={[field.fieldKey, 'sku']}
 				rules={[{ required: true }]}
 				placeholder='Item Name'
 			>
@@ -67,19 +69,12 @@ const ItemRow = ({ form, field, sku, remove, calculateTotal, onSelectRemoveProdu
 					))}
 				</Select>
 			</Form.Item>
-			<Form.Item
-				{...field}
-				name={[field.name, 'quantity']}
-				rules={[{ required: true }]}
-				fieldKey={[field.fieldKey, 'quantity']}
-				style={{ flex: '0 0 10%', borderRight: '1px solid black', margin: 0 }}
-			>
+			<Form.Item {...field} name={[field.name, 'quantity']} rules={[{ required: true }]} style={{ flex: '0 0 10%', borderRight: '1px solid black', margin: 0 }}>
 				<InputNumber style={{ width: '100%' }} min={0} max={product?.quantity || 0} placeholder={`${product?.quantity || 0} available`} onBlur={calculateAmount} />
 			</Form.Item>
 			<Form.Item
 				{...field}
 				name={[field.name, 'pricePerUnit']}
-				fieldKey={[field.fieldKey, 'pricePerUnit']}
 				style={{ flex: '0 0 10%', borderRight: '1px solid black', margin: 0, paddingRight: '8px', textAlign: 'right' }}
 				initialValue={product?.pricePerUnit}
 			>
@@ -87,38 +82,31 @@ const ItemRow = ({ form, field, sku, remove, calculateTotal, onSelectRemoveProdu
 					{CurrencyList[window.currency]?.symbol_native} {product?.pricePerUnit}
 				</span>
 			</Form.Item>
-			<Form.Item
-				{...field}
-				name={[field.name, 'discount']}
-				rules={[{ required: true }]}
-				fieldKey={[field.fieldKey, 'discount']}
-				style={{ flex: '0 0 10%', borderRight: '1px solid black', margin: 0 }}
-			>
+			<Form.Item {...field} name={[field.name, 'discount']} rules={[{ required: true }]} style={{ flex: '0 0 10%', borderRight: '1px solid black', margin: 0 }}>
 				<InputNumber style={{ width: '100%' }} onBlur={calculateAmount} />
 			</Form.Item>
 			<Form.Item
 				{...field}
 				name={[field.name, 'rate']}
-				fieldKey={[field.fieldKey, 'rate']}
 				rules={[{ required: true }]}
 				style={{ flex: '0 0 10%', borderRight: '1px solid black', margin: 0, paddingLeft: '8px' }}
 			>
 				<span>
-					{CurrencyList[window.currency]?.symbol_native} {form.getFieldValue('items')[field.fieldKey]?.rate}
+					{CurrencyList[window.currency]?.symbol_native} {form.getFieldValue('items')[field.name]?.rate}
 				</span>
 			</Form.Item>
-			<Form.Item
-				{...field}
-				name={[field.name, 'amount']}
-				fieldKey={[field.fieldKey, 'amount']}
-				style={{ flex: '0 0 10%', borderRight: '1px solid black', margin: 0, paddingRight: '8px', textAlign: 'right' }}
-				initialValue={amount}
-			>
+			<Form.Item {...field} name={[field.name, 'amount']} style={{ flex: '0 0 10%', borderRight: '1px solid black', margin: 0, paddingRight: '8px', textAlign: 'right' }}>
 				<span>
-					{CurrencyList[window.currency]?.symbol_native} {amount}
+					{CurrencyList[window.currency]?.symbol_native} {form.getFieldValue('items')[field.name]?.amount}
 				</span>
 			</Form.Item>
-			<div style={{ display: 'flex', justifyContent: 'center', paddingLeft: '10px', alignItems: 'center', cursor: 'pointer' }} onClick={() => remove(field.name)}>
+			<div
+				style={{ display: 'flex', justifyContent: 'center', paddingLeft: '10px', alignItems: 'center', cursor: 'pointer' }}
+				onClick={() => {
+					remove(field.name)
+					calculateTotal()
+				}}
+			>
 				<MinusCircleOutlined />
 			</div>
 		</div>
@@ -179,7 +167,7 @@ const CreateInvoice = ({ history }) => {
 	const calculateTotal = () => {
 		const items = form.getFieldValue('items')
 		const total = items.reduce((a, b) => a + b?.amount || 0, 0)
-		setTotal(total)
+		setTotal(total.toFixed(2))
 	}
 
 	const validateAndCreateInvoice = () => {
@@ -211,8 +199,20 @@ const CreateInvoice = ({ history }) => {
 
 					await increaseInvoiceNumber()
 
+					const owner = await ownerDetails()
+
 					Modal.success({
-						content: <InvoiceSuccess data={invoice} />,
+						content: (
+							<InvoiceSuccess
+								data={{
+									...invoice,
+									currency: CurrencyList[window.currency].symbol_native,
+									invoiceDate: moment(invoice.createdAt).format('DD/MM/YYYY'),
+									owner: owner.value,
+									retailerDetails: retailers.find(r => r._id === invoice.retailer),
+								}}
+							/>
+						),
 						icon: null,
 						maskClosable: true,
 						onOk: history.goBack,

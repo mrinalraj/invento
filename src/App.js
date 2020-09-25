@@ -63,6 +63,12 @@ const App = () => {
 								Products
 							</Link>
 						</Menu.Item>
+
+						<Menu.Item key='import'>
+							<Link onClick={() => setRoute('import')} to='/import'>
+								Import
+							</Link>
+						</Menu.Item>
 					</Menu>
 				</Header>
 				<Content style={{ padding: '0 50px' }}>

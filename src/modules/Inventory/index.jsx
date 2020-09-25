@@ -32,8 +32,6 @@ const Inventory = props => {
 		fetchList(page)
 	}, [page])
 
-	console.log(props)
-
 	const fetchList = async (currentPage = page) => {
 		setState({ loading: true })
 		const { pageNumber, pageSize } = page
@@ -146,7 +144,7 @@ const Inventory = props => {
 
 			<div style={{ marginLeft: '1rem', paddingBottom: '2rem' }}>
 				<Input.Search placeholder='Input search text' style={{ width: '20vw', marginRight: '2rem' }} onSearch={onSearch} />
-				<Button type='primary' shape='round' style={{ marginRight: '1rem' }} onClick={() => props.history.push('/incoming-trnasfer')}>
+				<Button type='primary' shape='round' style={{ marginRight: '1rem' }} onClick={() => props.history.push('/incoming-trnasfer')} disabled={true}>
 					<FolderAddFilled /> Incoming Transfer
 				</Button>
 				<Button

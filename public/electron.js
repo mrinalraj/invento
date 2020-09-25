@@ -26,9 +26,6 @@ function createWindow() {
 		})
 	mainWindow.loadURL(startUrl)
 	// Open the DevTools.
-	// if (process.env.NODE_ENV === 'development') {
-	mainWindow.webContents.openDevTools()
-	// }
 
 	// remove menubar
 	mainWindow.setMenuBarVisibility(false)

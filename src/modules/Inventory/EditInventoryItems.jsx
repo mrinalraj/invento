@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Modal, Button, Form, Input, message, Select, Spin } from 'antd'
+import { Modal, Button, Form, Input, message, Select, Spin, InputNumber } from 'antd'
 import styled from 'styled-components'
 import { updateInventoryItem, getInventoryList } from '@requests/inventory'
 
@@ -67,7 +67,7 @@ const EditInventoryItems = ({ visible, closeModal }) => {
 			width={900}
 			destroyOnClose={true}
 			footer={[
-				<Button type='primary' shape='round' key='save' onClick={editInventoryItem}>
+				<Button type='primary' shape='round' key='save' onClick={editInventoryItem} disabled={loading}>
 					Save
 				</Button>,
 				<Button key='close' shape='round' onClick={closeModal}>
@@ -124,7 +124,7 @@ const EditInventoryItems = ({ visible, closeModal }) => {
 								},
 							]}
 						>
-							<Input />
+							<InputNumber style={{ width: '100%' }} min={0} />
 						</Form.Item>
 						<Form.Item
 							name='pricePerUnit'
@@ -136,7 +136,7 @@ const EditInventoryItems = ({ visible, closeModal }) => {
 								},
 							]}
 						>
-							<Input />
+							<InputNumber style={{ width: '100%' }} min={0} />
 						</Form.Item>
 						<Form.Item name='description' label='Additional Description'>
 							<Input />
